@@ -66,6 +66,19 @@
               </div>
             </div>
 
+            <!-- Difficulty Filter -->
+            <div class="filter-container">
+              <div class="filter-label" id="difficulty-filter-label">Filter by difficulty:</div>
+              <div class="difficulty-filters" role="group" aria-labelledby="difficulty-filter-label" aria-describedby="difficulty-filter-help">
+                <button type="button" class="difficulty-filter active" data-difficulty="" aria-pressed="true">Any difficulty</button>
+                <button type="button" class="difficulty-filter" data-difficulty="All" aria-pressed="false">All</button>
+                <button type="button" class="difficulty-filter" data-difficulty="Beginner" aria-pressed="false">Beginner</button>
+                <button type="button" class="difficulty-filter" data-difficulty="Intermediate" aria-pressed="false">Intermediate</button>
+                <button type="button" class="difficulty-filter" data-difficulty="Advanced" aria-pressed="false">Advanced</button>
+              </div>
+              <p class="filter-help" id="difficulty-filter-help">All shows only activities with no specified difficulty. Any difficulty shows every level.</p>
+            </div>
+
             <!-- Day Filter -->
             <div class="filter-container day-filter-container">
               <div class="filter-label">Filter by day:</div>
@@ -168,6 +181,8 @@
       </div>
     </div>
 
+    <script src="difficulty.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
+

@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryFilters = document.querySelectorAll(".category-filter");
   const dayFilters = document.querySelectorAll(".day-filter");
   const timeFilters = document.querySelectorAll(".time-filter");
+  const difficultyFilters = document.querySelectorAll(".difficulty-filter");
 
   // Authentication elements
   const loginButton = document.getElementById("login-button");
@@ -40,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let currentDifficulty = "";
 
   // Authentication state
   let currentUser = null;
@@ -63,6 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const activeTimeFilter = document.querySelector(".time-filter.active");
     if (activeTimeFilter) {
       currentTimeRange = activeTimeFilter.dataset.time;
+    }
+
+    const activeDifficultyFilter = document.querySelector(".difficulty-filter.active");
+    if (activeDifficultyFilter) {
+      currentDifficulty = activeDifficultyFilter.dataset.difficulty;
     }
   }
 
@@ -96,6 +103,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     fetchActivities();
+  }
+
+  function setDifficultyFilter(difficulty) {
+    currentDifficulty = difficulty;
+    difficultyFilters.forEach((button) => {
+      const selected = button.dataset.difficulty === difficulty;
+      button.classList.toggle("active", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+    displayFilteredActivities();
   }
 
   // Check if user is already logged in (from localStorage)
@@ -428,6 +445,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      if (!ActivityDifficulty.matches(details, currentDifficulty)) {
+        return;
+      }
+
       // Apply weekend filter if selected
       if (currentTimeRange === "weekend" && details.schedule_details) {
         const activityDays = details.schedule_details.days;
@@ -502,6 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
 
+    // Only the three supported labels can be rendered; omitted levels stay hidden.
+    const difficultyLabel = ActivityDifficulty.label(details);
+    const difficultyHtml = difficultyLabel
+      ? `<p class="difficulty-label"><strong>Difficulty:</strong> ${difficultyLabel}</p>`
+      : "";
+
     // Create activity tag
     const tagHtml = `
       <span class="activity-tag" style="background-color: ${typeInfo.color}; color: ${typeInfo.textColor}">
@@ -526,6 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ${tagHtml}
       <h4>${name}</h4>
       <p>${details.description}</p>
+      ${difficultyHtml}
       <p class="tooltip">
         <strong>Schedule:</strong> ${formattedSchedule}
         <span class="tooltip-text">Regular meetings at this time throughout the semester</span>
@@ -641,6 +669,13 @@ document.addEventListener("DOMContentLoaded", () => {
       // Update current time filter and fetch activities
       currentTimeRange = button.dataset.time;
       fetchActivities();
+    });
+  });
+
+  // Add event listeners for difficulty filter buttons
+  difficultyFilters.forEach((button) => {
+    button.addEventListener("click", () => {
+      setDifficultyFilter(button.dataset.difficulty);
     });
   });
 
