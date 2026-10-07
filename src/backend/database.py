@@ -18,13 +18,21 @@ def hash_password(password):
     return ph.hash(password)
 
 def init_database():
-    """Initialize database if empty"""
+    """Initialize empty collections and add the newly announced manga club."""
 
     # Initialize activities if empty
     if activities_collection.count_documents({}) == 0:
         for name, details in initial_activities.items():
             activities_collection.insert_one({"_id": name, **details})
-            
+
+    # Add the new club to existing databases without overwriting enrollments
+    # or teacher edits when the application restarts.
+    activities_collection.update_one(
+        {"_id": "Manga Maniacs"},
+        {"$setOnInsert": initial_activities["Manga Maniacs"]},
+        upsert=True
+    )
+
     # Initialize teacher accounts if empty
     if teachers_collection.count_documents({}) == 0:
         for teacher in initial_teachers:
@@ -32,6 +40,21 @@ def init_database():
 
 # Initial database if empty
 initial_activities = {
+    "Manga Maniacs": {
+        "description": (
+            "Open a new chapter with Manga Maniacs! Dive into Japanese manga, "
+            "meet unforgettable heroes, unravel plot twists, and share your "
+            "favorite panels with fellow fans. From your first volume to your "
+            "next epic series, every reader is welcome on this creative adventure."
+        ),
+        "schedule": "Tuesdays at 7:00 PM",
+        "schedule_details": {
+            "days": ["Tuesday"],
+            "start_time": "19:00"
+        },
+        "max_participants": 15,
+        "participants": []
+    },
     "Chess Club": {
         "description": "Learn strategies and compete in chess tournaments",
         "schedule": "Mondays and Fridays, 3:15 PM - 4:45 PM",
